@@ -1,0 +1,277 @@
+# Plan de Acción: Mobile → Server
+
+> Construido sobre el reporte de gaps anterior. Cada ítem tiene scope claro, archivos afectados, y criterio de done.
+
+---
+
+## Parte 1 — Gaps de Código (Mobile + Server)
+
+### P1-A | Interceptor 401 con logout automático
+**Impacto:** 🔴 Crítico  
+**Archivos:** [`api_client.dart`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/mobile/lib/core/api/api_client.dart)
+
+El `ApiClient` mapea 401 a `UnauthorizedException` pero no toma acción. Necesita un segundo interceptor que actúe sobre ese error.
+
+**Cambio:**
+```dart
+// En _setupInterceptors(), agregar un segundo interceptor DESPUÉS del actual:
+_dio.interceptors.add(
+  InterceptorsWrapper(
+    onError: (DioException error, handler) async {
+      if (error.response?.statusCode == 401) {
+        await _storage.secureDelete(StorageKey.authToken);
+        await _storage.prefRemove(StorageKey.userName);
+        await _storage.prefRemove(StorageKey.userId);
+        // El router guard en app_router.dart reacciona a authNotifierProvider
+        // → redirige a /login automáticamente
+      }
+      return handler.next(error);
+    },
+  ),
+);
+```
+
+El router guard en [`app_router.dart`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/mobile/lib/core/router/app_router.dart) ya reacciona a `authNotifierProvider`. Si el token desaparece del storage, el redirect a `/login` se dispara solo.
+
+**Done cuando:** un 401 en cualquier endpoint provoca navegación a `/login` sin intervención del usuario.
+
+---
+
+### P1-B | Re-validar sesión en startup
+**Impacto:** 🟡 Medio  
+**Archivos:** `apps/mobile/lib/features/auth/ui/auth_notifier.dart`
+
+En el startup actual, `isAuthenticated()` solo verifica presencia del token en storage. Agregar una llamada a `/api/auth/me` para confirmar que el token sigue siendo válido en el servidor.
+
+**Flujo correcto:**
+```
+AppStorage.create()
+  → AuthNotifier.initialize()
+     → if (token exists in storage)
+         → GET /api/auth/me
+         → if 200 → setAuthenticated(true)
+         → if 401 → clear storage → setAuthenticated(false)
+     → else → setAuthenticated(false)
+```
+
+**Done cuando:** reiniciar la app con un token expirado muestra el login screen en lugar de quedar en estado roto.
+
+---
+
+### P1-C | Eliminar token del WS URI query params
+**Impacto:** 🟡 Medio (hygiene de seguridad)  
+**Archivos:** [`ws_client.dart`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/mobile/lib/core/ws/ws_client.dart)
+
+```dart
+// ANTES — token viaja en la query string, visible en logs de proxies
+final queryParams = <String, String>{};
+if (_currentSessionId != null) queryParams['sessionId'] = _currentSessionId!;
+if (_currentToken != null)     queryParams['token'] = _currentToken!;  // ← eliminar
+
+// DESPUÉS — solo sessionId como contexto, auth solo via mensaje auth
+final queryParams = <String, String>{};
+if (_currentSessionId != null && _currentSessionId!.isNotEmpty) {
+  queryParams['sessionId'] = _currentSessionId!;
+}
+```
+
+El servidor en [`ws/factory.ts`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/server/src/ws/factory.ts) ya ignora el token del query param. Solo el mensaje `{ type: "auth", token }` cuenta.
+
+**Done cuando:** los logs de Nginx no muestran el token en la URL del WebSocket upgrade.
+
+---
+
+### P1-D | CORS: agregar `X-Spaces-Return-Token` a allowHeaders
+**Impacto:** 🟡 Medio (prevención)  
+**Archivos:** [`apps/server/src/index.ts`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/server/src/index.ts#L100)
+
+```typescript
+// ANTES
+allowHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
+
+// DESPUÉS
+allowHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'X-Spaces-Return-Token'],
+```
+
+**Done cuando:** un preflight OPTIONS a `/api/auth/login` con ese header en `Access-Control-Request-Headers` recibe 200.
+
+---
+
+### P1-E | Timeout de Dio para streaming SSE
+**Impacto:** 🟡 Medio  
+**Archivos:** [`api_client.dart`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/mobile/lib/core/api/api_client.dart)
+
+El `receiveTimeout` de 30s mata streams largos de chat. Los callers de streaming deben pasar `Options(receiveTimeout: Duration.zero)` (Dio 5 — `Duration.zero` = sin timeout).
+
+```dart
+// Agregar método helper en ApiClient para streaming:
+Future<Response<ResponseBody>> getStream(String path, {Map<String, dynamic>? queryParameters}) {
+  return _dio.get<ResponseBody>(
+    path,
+    queryParameters: queryParameters,
+    options: Options(
+      responseType: ResponseType.stream,
+      receiveTimeout: Duration.zero,
+    ),
+  );
+}
+```
+
+**Done cuando:** una sesión de chat de más de 30s no corta el stream prematuramente.
+
+---
+
+## Parte 2 — Infraestructura de Deployment
+
+### Diagnóstico
+
+```
+Dockerfile:
+  EXPOSE 3000      ← servidor principal
+  EXPOSE 3001      ← preview server (interno)
+
+docker-compose.yml:
+  expose: [3000, 3001]   ← solo interno entre contenedores
+  # Sin `ports:` → el host NO accede directamente
+  # Coolify gestiona el proxy reverso (Traefik) via SERVICE_FQDN_SPACES_3000
+
+coolify-template.json:
+  "ports": ["3000:3000"]  ← Coolify lo usa para su proxy
+```
+
+**El diseño original:** un único contenedor que sirve la SPA web embebida + la API, expuesto por Coolify bajo HTTPS. El cliente web viene en el bundle.
+
+**Con mobile:** el mobile es un cliente externo que llama la misma API bajo el mismo FQDN. El problema no es arquitectural — el servidor ya expone `/api/*` públicamente. El problema es de **configuración y variables de entorno**.
+
+---
+
+### P2-A | `NODE_ENV=production` faltante en Dockerfile
+**Impacto:** 🔴 Crítico  
+**Archivos:** [`Dockerfile`](file:///c:/Users/themi/AgentWorkspace/the-spaces/Dockerfile#L57)
+
+```typescript
+// index.ts — la condición de producción
+const isProduction = process.env.NODE_ENV === 'production' || process.env.SPACES_ENV === 'production';
+```
+
+El Dockerfile actual NO setea `NODE_ENV`. Si el operador tampoco lo configura en Coolify, el servidor corre en modo desarrollo: CORS fail-open, logs verbosos, y el health endpoint expone `dataPath`.
+
+```dockerfile
+# Agregar al bloque ENV del Dockerfile (línea ~57):
+ENV NODE_ENV=production
+```
+
+---
+
+### P2-B | Variables faltantes en `coolify-template.json`
+**Impacto:** 🟡 Medio  
+**Archivos:** [`coolify-template.json`](file:///c:/Users/themi/AgentWorkspace/the-spaces/coolify-template.json)
+
+El template actual tiene 4 variables. Le faltan las críticas para producción robusta:
+
+```json
+// Agregar al array "environment":
+{
+  "key": "ALLOWED_ORIGINS",
+  "description": "Comma-separated CORS origins for the web client (e.g. https://app.mydomain.com). Mobile native apps don't require this.",
+  "required": false,
+  "default": ""
+},
+{
+  "key": "NODE_ENV",
+  "description": "Set to 'production' for production deployments.",
+  "required": false,
+  "default": "production"
+},
+{
+  "key": "SPACES_ENV",
+  "description": "Alternative production flag. Set to 'production'.",
+  "required": false,
+  "default": "production"
+}
+```
+
+---
+
+### P2-C | `docker-compose.yml` para desarrollo local con mobile
+**Impacto:** 🟢 Bajo (ya resuelto con mobile-proxy)  
+**Archivos:** [`docker-compose.yml`](file:///c:/Users/themi/AgentWorkspace/the-spaces/docker-compose.yml)
+
+El compose usa `expose` (no `ports`) por diseño — es para Coolify. Para dev local con mobile ya existe `pnpm mobile-proxy` (ngrok).
+
+**Acción:** solo documentar esto en el README. No cambiar el compose.
+
+---
+
+### P2-D | URL hardcodeada en el mobile: ServerConfig editable
+**Impacto:** 🔴 Crítico (para distribución)  
+**Archivos:** [`app_config.dart`](file:///c:/Users/themi/AgentWorkspace/the-spaces/apps/mobile/lib/core/config/app_config.dart), `SettingsScreen`
+
+La URL `https://the-spaces-api.pages.therry.dev` está hardcodeada en el binario. Para auto-hosting, el usuario necesita poder cambiarla.
+
+**Arquitectura propuesta — `ServerConfigService`:**
+
+```dart
+// lib/core/config/server_config_service.dart
+class ServerConfigService {
+  static const String _serverUrlKey = 'server_url';
+  final SharedPreferences _prefs;
+  
+  ServerConfigService(this._prefs);
+
+  String get apiBaseUrl {
+    // 1. Build-time override (CI/CD)
+    const fromEnv = String.fromEnvironment('SPACES_API_URL');
+    if (fromEnv.isNotEmpty) return fromEnv;
+    
+    // 2. User-configured (editable desde Settings)
+    final saved = _prefs.getString(_serverUrlKey);
+    if (saved != null && saved.isNotEmpty) return saved;
+    
+    // 3. Platform default
+    if (kReleaseMode) return 'https://the-spaces-api.pages.therry.dev';
+    if (!kIsWeb && Platform.isAndroid) return 'http://10.0.2.2:3000';
+    return 'http://localhost:3000';
+  }
+
+  Future<void> setApiBaseUrl(String url) async {
+    await _prefs.setString(_serverUrlKey, url.trimRight().replaceAll(RegExp(r'/+$'), ''));
+  }
+
+  Future<void> resetToDefault() async {
+    await _prefs.remove(_serverUrlKey);
+  }
+}
+```
+
+El `ApiClient` consume `ServerConfigService` a través de su provider.  
+El `WsClient` idem.  
+`SettingsScreen` muestra un campo editable con validación de URL.
+
+**Done cuando:** un usuario self-hosted puede escribir su URL de servidor en Settings y la app la usa sin reinstalar.
+
+---
+
+## Tabla de ejecución
+
+| # | Task | Archivos | Tiempo |
+|---|------|----------|--------|
+| 1 | **P2-A** `NODE_ENV=production` en Dockerfile | `Dockerfile` | 2 min |
+| 2 | **P1-D** CORS `allowHeaders` | `index.ts` | 2 min |
+| 3 | **P2-B** Variables en coolify-template | `coolify-template.json` | 10 min |
+| 4 | **P1-C** Token fuera de WS URI | `ws_client.dart` | 5 min |
+| 5 | **P1-A** Interceptor 401 + logout | `api_client.dart` | 20 min |
+| 6 | **P1-B** Re-validar sesión en startup | `auth_notifier.dart` | 30 min |
+| 7 | **P1-E** Streaming timeout | `api_client.dart` | 15 min |
+| 8 | **P2-D** ServerConfigService + UI | 3 archivos nuevos + settings | 90 min |
+
+**Total estimado:** ~3 horas de trabajo neto.
+
+---
+
+## Lo que NO hacer
+
+- ❌ **No agregar API Gateway** (Nginx dedicado, Kong) — overhead innecesario para single-tenant.  
+- ❌ **No separar el server en dos contenedores** — Bun sirve los statics eficientemente.  
+- ❌ **No implementar certificate pinning** — riesgo bajo para self-hosted, costo de mantenimiento alto.  
+- ❌ **No implementar refresh tokens** — Better Auth con `updateAge` maneja sliding window. Solo necesitamos reaccionar al 401.

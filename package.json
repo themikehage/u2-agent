@@ -1,0 +1,46 @@
+{
+  "name": "u2-agent",
+  "version": "0.2.0",
+  "description": "LLM-native Android automation. Control Android devices with 85% fewer tokens.",
+  "homepage": "https://u2agent.therry.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/therry/u2-agent"
+  },
+  "bugs": {
+    "url": "https://github.com/therry/u2-agent/issues"
+  },
+  "keywords": [
+    "android",
+    "adb",
+    "uiautomator2",
+    "llm",
+    "agent",
+    "automation",
+    "bun",
+    "claude",
+    "mcp"
+  ],
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "module": "src/index.ts",
+  "type": "module",
+  "bin": {
+    "u2-agent": "./src/index.ts",
+    "u2bun": "./src/index.ts"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "build": "bun build --compile src/index.ts --outfile ./u2-agent",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
+

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build artifacts (root only)
+/u2-agent
+/u2-agent.exe
+/u2bun
+/u2bun.exe
+
+# Internal tooling
+.atl/
+
+# Environment & logs
+.env
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db

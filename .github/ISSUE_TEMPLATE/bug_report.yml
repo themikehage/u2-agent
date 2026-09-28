@@ -1,0 +1,41 @@
+name: Bug Report
+description: Create a report to help us improve u2-agent
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "**Before reporting**: verify your device is connected by running `u2-agent device list`."
+  - type: input
+    id: command
+    attributes:
+      label: Command executed
+      placeholder: "u2-agent ui tap --ref @1"
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error output (stderr)
+      placeholder: "Paste output here..."
+    validations:
+      required: true
+  - type: input
+    id: bun-version
+    attributes:
+      label: Bun version (`bun --version`)
+      placeholder: "1.1.x"
+    validations:
+      required: true
+  - type: input
+    id: adb-version
+    attributes:
+      label: ADB version (`adb version`)
+    validations:
+      required: false
+  - type: input
+    id: device
+    attributes:
+      label: Device model & Android version
+      placeholder: "Pixel 7 / Android 14"
+    validations:
+      required: false
