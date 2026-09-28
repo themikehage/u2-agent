@@ -17,7 +17,7 @@ Before developing on `u2-agent`, ensure you have:
 
 1. Fork and clone the repository:
    ```bash
-   git clone https://github.com/therry/u2-agent.git
+   git clone https://github.com/themikehage/u2-agent.git
    cd u2-agent
    ```
 2. Install dependencies:

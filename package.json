@@ -5,10 +5,10 @@
   "homepage": "https://u2agent.therry.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/therry/u2-agent"
+    "url": "https://github.com/themikehage/u2-agent"
   },
   "bugs": {
-    "url": "https://github.com/therry/u2-agent/issues"
+    "url": "https://github.com/themikehage/u2-agent/issues"
   },
   "keywords": [
     "android",

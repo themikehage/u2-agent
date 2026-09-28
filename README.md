@@ -3,7 +3,7 @@
   <p><strong>LLM-native Android automation. 85% fewer tokens. Sub-15ms actions.</strong></p>
 
   <p>
-    <a href="https://github.com/therry/u2-agent/actions/workflows/ci.yml"><img src="https://github.com/therry/u2-agent/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
+    <a href="https://github.com/themikehage/u2-agent/actions/workflows/ci.yml"><img src="https://github.com/themikehage/u2-agent/actions/workflows/ci.yml/badge.svg" alt="CI Status" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" /></a>
     <a href="https://bun.sh"><img src="https://img.shields.io/badge/bun-%3E%3D1.1.0-fbf0df.svg?logo=bun" alt="Bun" /></a>
     <a href="https://u2agent.therry.dev"><img src="https://img.shields.io/badge/docs-u2agent.therry.dev-00ff9d.svg" alt="Website" /></a>
@@ -45,7 +45,7 @@ A standard 15-step agent interaction can burn hundreds of thousands of tokens ju
 ### 1. Installation
 Clone and install dependencies:
 ```bash
-git clone https://github.com/therry/u2-agent.git
+git clone https://github.com/themikehage/u2-agent.git
 cd u2-agent
 bun install
 ```
