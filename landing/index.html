@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>u2-agent — LLM-Native Android Automation</title>
+  <meta name="description" content="Control Android devices with 85% fewer tokens. Zero-dependency, sub-15ms cached handle actions. Built for Claude, GPT, and autonomous agent loops.">
+  <link rel="canonical" href="https://u2agent.therry.dev">
+
+  <!-- Open Graph / Social Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://u2agent.therry.dev">
+  <meta property="og:title" content="u2-agent — LLM-Native Android Automation">
+  <meta property="og:description" content="Control Android devices with 85% fewer tokens. Built for AI agents. Sub-15ms cached actions via background daemon.">
+  <meta property="og:image" content="https://u2agent.therry.dev/assets/og-image.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="u2-agent — LLM-Native Android Automation">
+  <meta name="twitter:description" content="Control Android devices with 85% fewer tokens. Built for AI agents.">
+  <meta name="twitter:image" content="https://u2agent.therry.dev/assets/og-image.png">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Decorative Canvas -->
+  <div class="bg-decor">
+    <div class="bg-grid"></div>
+    <div class="bg-glow-hero"></div>
+    <div class="bg-glow-section" style="top: 1200px; right: -100px;"></div>
+    <div class="bg-glow-section" style="top: 2400px; left: -100px;"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="nav-header">
+    <div class="container nav-container">
+      <a href="#" class="nav-brand" id="nav-brand-logo">
+        <div class="brand-icon">u2</div>
+        <span>u2-agent</span>
+        <span class="version-badge">v0.2.0</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#problem" class="nav-link">The Problem</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#simulator" class="nav-link">Playground</a></li>
+        <li><a href="#quickstart" class="nav-link">Quick Start</a></li>
+        <li><a href="#architecture" class="nav-link">Architecture</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://github.com/therry/u2-agent" target="_blank" rel="noopener noreferrer" class="btn-github" id="nav-github-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>Star on GitHub</span>
+        </a>
+        <a href="#quickstart" class="btn-primary" id="nav-cta-btn">Install CLI</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">
+        <span class="hero-pill-pulse"></span>
+        Zero-Dependency Android Automation for AI Agents
+      </div>
+
+      <h1 class="hero-title">
+        Control Android devices with <span class="hero-title-gradient">85% fewer tokens</span>.
+      </h1>
+
+      <p class="hero-subtitle">
+        <code>u2-agent</code> converts messy Android accessibility trees into ultra-compact semantic handles (<code>@1</code>, <code>@2</code>, ...) with sub-15ms cached execution. Built specifically for Claude, GPT-4o, and autonomous agent loops.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#quickstart" class="btn-primary" id="hero-get-started-btn">Get Started in 2 Minutes &rarr;</a>
+        <a href="https://github.com/therry/u2-agent" target="_blank" rel="noopener noreferrer" class="btn-secondary" id="hero-github-btn">View Documentation</a>
+      </div>
+
+      <div class="clone-bar">
+        <span>$ git clone https://github.com/therry/u2-agent</span>
+        <button class="clone-btn copy-trigger" data-copy-text="git clone https://github.com/therry/u2-agent && cd u2-agent && bun install" id="hero-copy-clone-btn">Copy</button>
+      </div>
+
+      <!-- Animated Terminal Demo -->
+      <div class="terminal-window" style="margin-top: 48px;">
+        <div class="terminal-header">
+          <div class="terminal-controls">
+            <span class="terminal-dot dot-red"></span>
+            <span class="terminal-dot dot-yellow"></span>
+            <span class="terminal-dot dot-green"></span>
+          </div>
+          <div class="terminal-title">
+            <span>agent-session • Pixel 7 Pro</span>
+            <span class="terminal-daemon-badge">Daemon: Hot (11ms)</span>
+          </div>
+          <div class="terminal-actions">
+            <button class="terminal-btn" id="terminal-replay-btn" title="Replay terminal animation">↺ Replay</button>
+          </div>
+        </div>
+        <div class="terminal-body" id="hero-terminal-body">
+          <!-- Populated by JavaScript animation -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Problem Section (Comparison & Benchmarks) -->
+  <section class="section" id="problem">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Token Bottleneck</span>
+        <h2 class="section-title">Why existing tools cripple mobile AI agents</h2>
+        <p class="section-desc">
+          Standard mobile tools dump raw Android View hierarchies containing thousands of useless container nodes. Your agent's context window gets choked before it even takes its first action.
+        </p>
+      </div>
+
+      <div class="comparison-grid">
+        <!-- Problem Card -->
+        <div class="comparison-card card-problem">
+          <div class="comp-header">
+            <div class="comp-title">
+              <span>Standard XML Dump / Appium</span>
+            </div>
+            <span class="comp-badge badge-red">~15,200 Tokens</span>
+          </div>
+
+          <div class="comp-metrics">
+            <div class="metric-box">
+              <div class="metric-label">Token Footprint</div>
+              <div class="metric-val val-bad">~15k tokens</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Execution Latency</div>
+              <div class="metric-val val-bad">~850 ms</div>
+            </div>
+          </div>
+
+          <div class="code-preview-box">
+&lt;hierarchy rotation="0"&gt;
+  &lt;node index="0" class="android.widget.FrameLayout" package="com.google.android.youtube" bounds="[0,0][1080,2400]"&gt;
+    &lt;node index="0" class="android.widget.LinearLayout" bounds="[0,0][1080,2400]"&gt;
+      &lt;node index="0" class="android.view.ViewGroup" bounds="[0,96][1080,2400]"&gt;
+        &lt;node index="0" class="androidx.recyclerview.widget.RecyclerView" bounds="[0,96][1080,2400]"&gt;
+          &lt;node index="0" class="android.widget.FrameLayout" bounds="[0,96][1080,320]"&gt;
+            &lt;node index="0" text="Search YouTube" resource-id="com.google.android.youtube:id/search_box" class="android.widget.EditText" bounds="[144,120][936,216]" /&gt;
+          &lt;/node&gt;
+        &lt;/node&gt;
+      &lt;/node&gt;
+    &lt;/node&gt;
+  &lt;/node&gt;
+&lt;/hierarchy&gt;
+          </div>
+
+          <div class="comp-footer">
+            ⚠️ <strong>75% context consumed</strong> in 1 inspection. Structural noise confuses LLM selector reasoning.
+          </div>
+        </div>
+
+        <!-- Solution Card -->
+        <div class="comparison-card card-solution">
+          <div class="comp-header">
+            <div class="comp-title">
+              <span>u2-agent Semantic Tree</span>
+            </div>
+            <span class="comp-badge badge-green">~240 Tokens (-85%)</span>
+          </div>
+
+          <div class="comp-metrics">
+            <div class="metric-box">
+              <div class="metric-label">Token Footprint</div>
+              <div class="metric-val val-good">~240 tokens</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">Execution Latency</div>
+              <div class="metric-val val-good">&lt; 15 ms</div>
+            </div>
+          </div>
+
+          <div class="code-preview-box">
+[App: com.google.android.youtube]
+[@1] Input "Search YouTube"
+[@2] Button "Explore trending"
+[@3] Item "Live lo-fi hip hop radio - beats to relax"
+[@4] Button "Subscribe"
+[@5] Tab "Home"
+[@6] Tab "Shorts"
+[@7] Tab "Subscriptions"
+          </div>
+
+          <div class="comp-footer">
+            ✅ <strong>Actionable handles (@1..@N)</strong> with 85% bounding-box deduplication and zero container junk.
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Calculator -->
+      <div class="calc-container">
+        <div class="calc-info">
+          <h3>Token & Cost Savings Calculator</h3>
+          <p class="section-desc" style="font-size: 0.95rem;">
+            Slide to see how much context and API budget your agent saves across an automation workflow:
+          </p>
+
+          <div class="calc-slider-wrapper">
+            <div class="calc-slider-header">
+              <span>Agent Routine Steps:</span>
+              <span class="slider-val"><span id="calc-steps-val">15</span> steps</span>
+            </div>
+            <input type="range" min="1" max="50" value="15" class="custom-range" id="calc-steps-slider">
+          </div>
+        </div>
+
+        <div class="calc-results">
+          <div class="calc-result-row">
+            <span class="calc-res-label">Standard XML Dumps:</span>
+            <span class="calc-res-val val-bad" id="calc-xml-tokens">225,000 tokens</span>
+          </div>
+          <div class="calc-result-row">
+            <span class="calc-res-label">u2-agent Snapshots:</span>
+            <span class="calc-res-val val-good" id="calc-u2-tokens">3,600 tokens</span>
+          </div>
+          <div class="calc-result-row">
+            <span class="calc-res-label">Context Savings:</span>
+            <span class="calc-res-val val-good" id="calc-saved-tokens">98% (221,400)</span>
+          </div>
+          <div class="calc-result-row">
+            <span class="calc-res-label">Est. Cost Saved (Claude / GPT-4o):</span>
+            <span class="calc-res-val" style="color: var(--accent-cyan);" id="calc-cost-savings">$0.66 / run</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Sub-15ms Loop</span>
+        <h2 class="section-title">How the 3-step agent loop works</h2>
+        <p class="section-desc">
+          Zero token overhead, predictable deterministic error codes, and warm background sessions.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3 class="step-title">Semantic Snapshot</h3>
+          <p class="step-desc">
+            <code>u2-agent ui snapshot</code> strips frame containers, merges overlapping ghost wrappers, and indexes every interactive button, input, and item with an ephemeral reference handle (<code>@1</code>, <code>@2</code>, ...).
+          </p>
+          <div class="step-code-snip">
+            $ u2-agent ui snapshot
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3 class="step-title">Sub-15ms Cached Tap</h3>
+          <p class="step-desc">
+            The LLM issues an action specifying <code>--ref "@N"</code>. The background daemon resolves exact screen coordinates directly from RAM in sub-15ms without cold re-dumping or ADB disconnects.
+          </p>
+          <div class="step-code-snip">
+            $ u2-agent ui tap --ref @1
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3 class="step-title">Clean Stream Separation</h3>
+          <p class="step-desc">
+            <code>stdout</code> emits strictly compact machine text (<code>ok</code> or snapshot trees). Diagnostics, self-healing hints, and audit logs flow to <code>stderr</code>, preventing agent reasoning contamination.
+          </p>
+          <div class="step-code-snip">
+            ok
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Core Invariants</span>
+        <h2 class="section-title">Engineered for agent autonomy</h2>
+        <p class="section-desc">
+          Strictly adhering to the architectural rules defined in <code>AGENTS.md</code>.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">⚡</div>
+          <h3 class="feature-title">Zero Heavy Dependencies</h3>
+          <p class="feature-desc">
+            Crafted purely with Bun and native TypeScript APIs. No bulky WebDriver dependencies, Puppeteer emulators, or Java runtime wrappers on the host.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🚀</div>
+          <h3 class="feature-title">Persistent Hot Daemon</h3>
+          <p class="feature-desc">
+            Keeps ADB socket forwards and UIAutomator2 JSON-RPC sessions alive in the background, slashing per-action execution latency from 800ms to under 15ms.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🧠</div>
+          <h3 class="feature-title">Semantic Deduplication</h3>
+          <p class="feature-desc">
+            Automatically collapses nested ghost wrappers with &ge; 85% bounding box overlap into single high-level semantic components (Input, Button, Tab, Toggle).
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🤖</div>
+          <h3 class="feature-title">Universal Model Support</h3>
+          <p class="feature-desc">
+            Drop-in compatible with Claude Code, OpenCode, Cursor, Antigravity, AutoGen, and custom Python / LangChain agent orchestration loops.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🔧</div>
+          <h3 class="feature-title">Tool Schema Discovery</h3>
+          <p class="feature-desc">
+            Export standard function-calling schemas with <code>tools schema --format openai</code> ready to plug into Anthropic, OpenAI, or Gemini tool call catalogs.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">🛡️</div>
+          <h3 class="feature-title">Deterministic Recovery</h3>
+          <p class="feature-desc">
+            Every failure emits distinct machine error codes (<code>SELECTOR_NOT_FOUND</code>, <code>DEVICE_OFFLINE</code>, <code>USAGE</code>) accompanied by actionable recovery hints on stderr.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Playground / Simulator -->
+  <section class="section" id="simulator">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Interactive Preview</span>
+        <h2 class="section-title">CLI Command Simulator</h2>
+        <p class="section-desc">
+          Test drive u2-agent commands and inspect their LLM-compact output shapes live.
+        </p>
+      </div>
+
+      <div class="simulator-wrapper">
+        <div class="sim-nav">
+          <button class="sim-tab active" data-key="snapshot">ui.snapshot</button>
+          <button class="sim-tab" data-key="tap">ui.tap</button>
+          <button class="sim-tab" data-key="type">ui.type</button>
+          <button class="sim-tab" data-key="schema">tools.schema</button>
+          <button class="sim-tab" data-key="restart">app.restart</button>
+        </div>
+
+        <div class="sim-content">
+          <div class="sim-panel-left">
+            <div>
+              <h3 class="sim-panel-title" id="sim-active-title">UI Snapshot</h3>
+              <p class="sim-panel-desc" id="sim-active-desc">
+                Extracts the screen view tree and maps actionable items to handles.
+              </p>
+              <div class="sim-cmd-box">
+                <code id="sim-active-cmd">u2-agent ui snapshot --limit 30</code>
+              </div>
+            </div>
+
+            <div>
+              <button class="sim-run-btn" id="sim-run-btn">
+                <span>▶ Run Command</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sim-panel-right">
+            <pre id="sim-output"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start Section -->
+  <section class="section" id="quickstart">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Quick Start</span>
+        <h2 class="section-title">Up and running in 2 minutes</h2>
+        <p class="section-desc">
+          All you need is Bun and an Android device with USB debugging enabled.
+        </p>
+      </div>
+
+      <div class="quickstart-steps">
+        <div class="qs-step">
+          <div class="qs-step-title">
+            <span class="qs-step-badge">1</span>
+            <span>Clone and install</span>
+          </div>
+          <p class="qs-step-desc">Clone the repository and install dependencies with Bun:</p>
+          <div class="code-box">
+            <code id="qs-code-1">git clone https://github.com/therry/u2-agent.git &amp;&amp; cd u2-agent &amp;&amp; bun install</code>
+            <button class="copy-icon-btn copy-trigger" data-copy-target="qs-code-1">Copy</button>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-title">
+            <span class="qs-step-badge">2</span>
+            <span>Provision target device</span>
+          </div>
+          <p class="qs-step-desc">Verify your connected device and install the lightweight UIAutomator2 RPC server:</p>
+          <div class="code-box">
+            <code id="qs-code-2">bun run src/index.ts setup install</code>
+            <button class="copy-icon-btn copy-trigger" data-copy-target="qs-code-2">Copy</button>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-title">
+            <span class="qs-step-badge">3</span>
+            <span>Inspect and interact</span>
+          </div>
+          <p class="qs-step-desc">Take your first compact semantic snapshot and tap elements by handle:</p>
+          <div class="code-box">
+            <code id="qs-code-3">bun run src/index.ts ui snapshot</code>
+            <button class="copy-icon-btn copy-trigger" data-copy-target="qs-code-3">Copy</button>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-title">
+            <span class="qs-step-badge">4</span>
+            <span>(Optional) Compile standalone executable</span>
+          </div>
+          <p class="qs-step-desc">Build a single self-contained binary without needing Bun on PATH:</p>
+          <div class="code-box">
+            <code id="qs-code-4">bun run build</code>
+            <button class="copy-icon-btn copy-trigger" data-copy-target="qs-code-4">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Deep Dive -->
+  <section class="section" id="architecture">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">System Design</span>
+        <h2 class="section-title">Under the hood</h2>
+        <p class="section-desc">
+          How u2-agent achieves sub-15ms interaction loops over ADB.
+        </p>
+      </div>
+
+      <div class="arch-diagram">
+        <div class="arch-node">
+          <div class="arch-node-left">
+            <div class="arch-node-icon">🤖</div>
+            <div>
+              <div class="arch-node-name">AI Agent Layer (Claude, GPT, OpenCode)</div>
+              <div class="arch-node-sub">Issues CLI commands with handle selectors (--ref "@1")</div>
+            </div>
+          </div>
+          <span class="version-badge">Client</span>
+        </div>
+
+        <div class="arch-connector">
+          <div class="arch-line"></div>
+        </div>
+
+        <div class="arch-node" style="border-color: var(--accent-emerald);">
+          <div class="arch-node-left">
+            <div class="arch-node-icon">⚡</div>
+            <div>
+              <div class="arch-node-name">u2-agent Background Daemon (HTTP/IPC)</div>
+              <div class="arch-node-sub">Holds active ADB connection hot • Resolves @handles in RAM (&lt; 15ms)</div>
+            </div>
+          </div>
+          <span class="comp-badge badge-green">In-Memory Cache</span>
+        </div>
+
+        <div class="arch-connector">
+          <div class="arch-line"></div>
+        </div>
+
+        <div class="arch-node">
+          <div class="arch-node-left">
+            <div class="arch-node-icon">📱</div>
+            <div>
+              <div class="arch-node-name">Android Device (UIAutomator2 JSON-RPC)</div>
+              <div class="arch-node-sub">Executes click, type, swipe, and hardware key operations natively</div>
+            </div>
+          </div>
+          <span class="version-badge">Target Device</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <a href="#" class="nav-brand">
+            <div class="brand-icon">u2</div>
+            <span>u2-agent</span>
+          </a>
+          <p class="footer-desc">
+            Zero-dependency, LLM-native Android automation for autonomous AI agents.
+          </p>
+        </div>
+
+        <div class="footer-nav">
+          <div class="footer-col">
+            <h4>Documentation</h4>
+            <ul>
+              <li><a href="#problem">The Problem</a></li>
+              <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#quickstart">Quick Start</a></li>
+              <li><a href="https://github.com/therry/u2-agent/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Community</h4>
+            <ul>
+              <li><a href="https://github.com/therry/u2-agent" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+              <li><a href="https://github.com/therry/u2-agent/issues" target="_blank" rel="noopener noreferrer">Issue Tracker</a></li>
+              <li><a href="https://github.com/therry/u2-agent/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+              <li><a href="https://github.com/therry/u2-agent/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">Security Policy</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <ul>
+              <li><a href="https://github.com/therry/u2-agent/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></li>
+              <li><a href="https://github.com/therry/u2-agent/blob/main/CODE_OF_CONDUCT.md" target="_blank" rel="noopener noreferrer">Code of Conduct</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 therry. Released under the MIT License.
+        </div>
+        <div>
+          Crafted with Bun &amp; TypeScript for autonomous agent systems.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
