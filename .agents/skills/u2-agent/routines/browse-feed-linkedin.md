@@ -5,7 +5,7 @@
 - Precondition: device unlocked; LinkedIn app installed.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. If screen reports `locked: true`, unlock first:
    `adb -s <SERIAL> shell input keyevent KEYCODE_WAKEUP && adb -s <SERIAL> shell wm dismiss-keyguard && adb -s <SERIAL> shell input swipe 540 1400 540 800 200`

@@ -10,7 +10,7 @@ Documento de trabajo basado en el análisis del código actual (`src/`) y en la 
 `u2bun` **nunca arranca** el servidor uiautomator2 del dispositivo. `DeviceSession.connect()` solo hace `adb forward tcp:9008` + `ping` (`src/runtime/device.ts:24-44`). Si el servidor (puerto 9008) está caído, el `ping` falla y se lanza un `DeviceOfflineError` **engañoso**: el dispositivo SÍ está online, lo que está caído es el runtime.
 
 Evidencia de la sesión real:
-- `adb devices` → `da0f5e72` y `192.168.1.19:5555` en estado `device` (online).
+- `adb devices` → `<SERIAL>` en estado `device` (online).
 - `netstat -tln | grep 9008` → sin listener.
 - `ui snapshot` → `Error [DEVICE_OFFLINE]: ... socket connection was closed unexpectedly`, con hint `Run u2bun device reconnect` que **no resuelve nada**.
 - Arreglo manual: `adb shell "nohup sh -c 'CLASSPATH=/data/local/tmp/u2.jar app_process / com.wetest.uia2.Main -p 9008' ..."` → puerto 9008 en `LISTEN` y `ui snapshot` funcionó.

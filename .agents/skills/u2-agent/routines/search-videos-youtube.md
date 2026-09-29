@@ -5,7 +5,7 @@
 - Precondition: device unlocked and on the launcher home screen.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. Launch YouTube. `app start` fails; use monkey directly:
    `adb -s <SERIAL> shell monkey -p com.google.android.youtube -c android.intent.category.LAUNCHER 1`
@@ -34,4 +34,3 @@ inside u2bun (workdir: `u2bun/`)
 - `ui input` uses clipboard+paste internally, so accented/special chars type correctly.
 - Snapshot is sparse (~6 actionable cards); to build a list of N videos, scroll repeatedly and dedupe across snapshots. Some cards are only "Button" with no text (sponsored/video thumbnails).
 - `ui swipe` REQUIRES `--from-pos X,Y --to-pos X,Y` (or explicit x/y flags); it errors with `USAGE` otherwise.
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

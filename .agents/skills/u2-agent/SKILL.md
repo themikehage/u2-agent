@@ -19,11 +19,21 @@ description: Android UI Automator control CLI for token-efficient agent automati
 ## Global CLI Flags
 
 Every command supports:
-- `--serial <serial>`: Target a specific device (e.g. `192.168.1.19:5555`).
+- `--serial <serial>`: Target a specific device. Optional — a single connected device is auto-selected (see "Device Selection" below).
 - `--json`: Output full structured JSON envelope (`{"ok": true, ...}`).
 - `--quiet`: Suppress standard `ok` text output on success.
 - `--timeout <seconds>`: Set command timeout in seconds (default: 30).
 - `--help` / `-h`: Contextual help for domain or command.
+
+---
+
+## Device Selection
+
+Routines are device-agnostic: never hardcode a serial.
+
+- Run `device list` to see attached devices.
+- Omit `--serial` when exactly one device is connected — it is auto-selected.
+- Pass `--serial <SERIAL>` only when two or more devices are attached; otherwise commands fail with `DEVICE_AMBIGUOUS`.
 
 ---
 

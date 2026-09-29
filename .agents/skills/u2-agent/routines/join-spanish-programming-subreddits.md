@@ -5,7 +5,7 @@
 - Precondition: Reddit installed and logged in; search bar accessible from home.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.reddit.frontpage -c android.intent.category.LAUNCHER 1` → launch Reddit.
 2. `ui snapshot` → confirm logged in ("Cuenta de Significant_Let_6361" at bottom).
@@ -28,4 +28,4 @@ inside u2bun (workdir: `u2bun/`)
 - Typing "programación" with LatinIME/Gboard active + `ui.input` uses `input_method: "clipboard"` and CORRUPTS the accented char (`programaci��n`). Before typing non-ASCII: activate AdbKeyboard (`adb shell ime set com.github.uiautomator/.AdbKeyboard`), tap field, `am broadcast -a ADB_KEYBOARD_CLEAR_TEXT`, retype (will report `input_method: "adb_keyboard"`), then restore Gboard via `ime set com.google.android.inputmethod.latin/...` before finishing.
 - As of Aug 2026, the 4 big communities were ALREADY subscribed; only r/programadores needed joining (952 members, tiny but the largest of the remaining ones). The other remaining results (r/programar ~2, r/programacion_Arg ~5 weekly) are not worth joining.
 - `ui scroll` can throw `TRANSIENT` SecurityException; fall back to `ui swipe --from-pos 540,1600 --to-pos 540,600`.
-- Device serial: `192.168.1.19:5555` (WiFi); device can appear `offline` and needs `adb disconnect` + `adb connect` before use.
+- A device can appear `offline`; recover with `device reconnect` (or `adb disconnect <SERIAL>` + `adb connect <SERIAL>`) before retrying.

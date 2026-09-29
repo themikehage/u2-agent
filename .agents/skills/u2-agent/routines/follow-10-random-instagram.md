@@ -5,7 +5,7 @@
 - Precondition: Instagram installed and logged in.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.instagram.android -c android.intent.category.LAUNCHER 1` → launch Instagram.
 2. `ui tap --text "Buscar y explorar"` (bottom tab) → Explore grid of random accounts.
@@ -22,4 +22,3 @@ inside u2bun (workdir: `u2bun/`)
 - The "Seguir" button next to a collab username sometimes toggles only the collab panel; if ambiguous, tap the collaborator rows (e.g. `Text "get.ta.grip"` / `Button "Seguir"` under "Colaboradores") individually.
 - Home feed: suggestion follow buttons change labels to "Siguiendo" but the row re-renders; verify via `ui dump` grep `contentDesc "Sigue(s) a <name>"`.
 - A `Cerrar` dialog (bottom sheet) can appear; tap `Button "Cerrar"` before continuing.
-- Device serial: `192.168.1.19:5555` (WiFi).

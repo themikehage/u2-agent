@@ -5,9 +5,9 @@
 - Precondition: Facebook feed is open; optional ad-personalization dialog may appear on top.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
-1. `bun run src/index.ts --serial da0f5e72 app start --package com.facebook.katana --json`
+1. `bun run src/index.ts app start --package com.facebook.katana --json`
 2. If an ad dialog shows (`Puedes administrar tu experiencia publicitaria`), dismiss it: `ui tap --description "Recordármelo más tarde"`.
 3. `ui tap --description "Buscar" --json`  (top search button, content-desc "Buscar")
 4. `ui input --text "<query>" --json`  (works now — `setInputText` uses `setClipboard`+`pasteClipboard` internally)

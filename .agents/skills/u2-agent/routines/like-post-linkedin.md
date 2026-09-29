@@ -5,11 +5,11 @@
 - Precondition: LinkedIn feed is visible with at least one post rendered.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
-1. `bun run src/index.ts --serial da0f5e72 app start --package com.linkedin.android --json`  (or `ui tap --text "LinkedIn"` from launcher)
-2. `bun run src/index.ts --serial da0f5e72 ui dump --json`  → find a post's reaction-state element with `contentDesc` containing `Estado del botón de reacción`.
-3. `bun run src/index.ts --serial da0f5e72 ui tap --desc_contains "Estado del botón de reacción" --expect_desc_contains "ninguna reacción" --expect_element_absent --json`
+1. `bun run src/index.ts app start --package com.linkedin.android --json`  (or `ui tap --text "LinkedIn"` from launcher)
+2. `bun run src/index.ts ui dump --json`  → find a post's reaction-state element with `contentDesc` containing `Estado del botón de reacción`.
+3. `bun run src/index.ts ui tap --desc_contains "Estado del botón de reacción" --expect_desc_contains "ninguna reacción" --expect_element_absent --json`
 
 ## Postcondition
 - `expect_satisfied: true` (the "ninguna reacción" state disappears) and the reaction state text flips to `Estado del botón de reacción: recomendar`, while the reactions counter increments by 1 (e.g. `28 reacciones` → `29 reacciones`).

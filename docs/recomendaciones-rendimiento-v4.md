@@ -1,6 +1,6 @@
 # Reporte de Oportunidades — u2bun CLI (Rendimiento y Velocidad)
 
-**Fecha:** 2026-08-15 · **Dispositivo:** Mi 9 SE vía WiFi (`192.168.1.19:5555`) · **Bun 1.3.14**
+**Fecha:** 2026-08-15 · **Dispositivo:** Mi 9 SE vía WiFi (`<SERIAL>`) · **Bun 1.3.14**
 **Enfoque:** cada token y cada segundo cuentan. Basado en mediciones reales y en toda la operación realizada (YouTube, Facebook, Facebook Lite, Reddit, Play Store, rutinas).
 
 ---

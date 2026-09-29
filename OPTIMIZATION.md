@@ -91,7 +91,7 @@ Goal: every token and every second counts. Findings ranked by impact. Each entry
 - `hint:` on stderr turns every error into an executable next step, cutting the "read error table in SKILL.md" hop.
 
 ### 4.4 `device auto` / online-only filter
-- `device list` returns both `da0f5e72 offline` and `192.168.1.19:5555 device`. Add `device list --online` or a `device auto` that resolves the single online serial, so routines stop hardcoding a serial that goes stale.
+- `device list` returns both `<SERIAL_A> offline` and `<SERIAL_B> device`. Add `device list --online` or a `device auto` that resolves the single online serial, so routines stop hardcoding a serial that goes stale.
 
 ### 4.5 First-class routine runner
 - Routines currently live as markdown the agent must read + translate (SKILL.md §0). The `run.steps` batch domain already exists (`src/domains/run.ts`) and the registry reserves `macro`. Add `u2bun routine <slug>` that loads `.agents/skills/u2bun/routines/<slug>.md` (or a JSON form) and executes it — one command instead of N translated steps.

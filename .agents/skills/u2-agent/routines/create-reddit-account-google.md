@@ -5,7 +5,7 @@
 - Precondition: Reddit installed, not logged in; a Google account exists on the device.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.reddit.frontpage -c android.intent.category.LAUNCHER 1` → launch Reddit.
 2. `ui snapshot` → welcome screen: "El lugar más real de internet" + `Button "Empezar"`.
@@ -29,4 +29,3 @@ inside u2bun (workdir: `u2bun/`)
 - Calendar: picking a day doesn't confirm; you must tap the OK button. Navigating months accidentally happens when tapping empty nodes around the title — the left empty node = previous month, right empty node = next month.
 - The "Continuar" button appears disabled (grey) until a birthday is selected.
 - Skip everything possible; only cumpleaños is mandatory.
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

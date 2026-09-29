@@ -5,7 +5,7 @@
 - Precondition: LinkedIn feed visible with at least one post rendered. For accented text, the AdbKeyboard IME (`com.github.uiautomator/.AdbKeyboard`) must be the active input method (see §Known Pitfalls).
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `bun run src/index.ts --serial <SERIAL> app start --package com.linkedin.android --json`
 2. `bun run src/index.ts --serial <SERIAL> ui snapshot --limit 60 --json`  → pick a post and read its message. If truncated (`… más`), tap the text block to expand it, then re-snapshot to read the full message.

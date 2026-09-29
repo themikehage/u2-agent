@@ -5,7 +5,7 @@
 - Precondition: Facebook feed is open and logged in; a post with comments is visible.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.facebook.katana -c android.intent.category.LAUNCHER 1` → launch Facebook.
 2. `ui snapshot --limit 60` → find the post; the "Comentar" button appears as `Button "Comentar"` with a `Item "<N>"` view count next to it.
@@ -26,4 +26,3 @@ inside u2bun (workdir: `u2bun/`)
 - The "Comentar" button is not always in the first 30 snapshot lines; use `--limit 60` or scroll.
 - `ui input` handles accented/special chars correctly (clipboard+paste or AdbKeyboard IME).
 - Handles shift after each screen change; always re-snapshot before tapping.
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

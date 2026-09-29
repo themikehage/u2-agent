@@ -2,7 +2,7 @@
 
 Documento de trabajo que **complementa** a la v1 (`docs/recomendaciones-rendimiento.md`) y a la v2 (`docs/recomendaciones-rendimiento-v2.md`). Cada recomendación cita evidencia (`archivo:línea`), impacto estimado y propuesta concreta. Prioridades: **P0** (bloquea o degrada cada interacción), **P1** (rendimiento/correctitud relevante), **P2** (ergonomía/consistencia).
 
-> Origen: ejecución real de "like en Facebook" sobre `Mi_9_SE` (serial wifi `192.168.1.19:5555`). Los dos bugs de esta sesión ya están en revisión; esta v3 documenta su **causa raíz** y el fix de rendimiento, además de hallazgos nuevos.
+> Origen: ejecución real de "like en Facebook" sobre `Mi_9_SE` (serial wifi `<SERIAL>`). Los dos bugs de esta sesión ya están en revisión; esta v3 documenta su **causa raíz** y el fix de rendimiento, además de hallazgos nuevos.
 
 ---
 

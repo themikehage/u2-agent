@@ -5,7 +5,7 @@
 - Precondition: LinkedIn open and logged in on the home feed (bottom nav: Inicio/Mi red/Publicar/Empleos/Más).
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `bun run src/index.ts --serial <SERIAL> app start --package com.linkedin.android --json`
 2. `bun run src/index.ts --serial <SERIAL> ui snapshot --json`  → find the "Mi red" tab ref (bottom nav).

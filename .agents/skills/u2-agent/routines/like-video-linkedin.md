@@ -3,10 +3,10 @@
 ## Context
 - App package / Activity where this starts: `com.linkedin.android` (home feed, `LaunchActivityDefault`)
 - Precondition: LinkedIn feed visible; scroll until a video post appears.
-- Device: use whatever ADB device is online (`device list`), e.g. `192.168.1.19:5555`. `da0f5e72` may be offline.
+- Device: any online ADB device (`device list`); omit `--serial` when exactly one is connected.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `bun run src/index.ts --serial <SERIAL> app start --package com.linkedin.android`
 2. `bun run src/index.ts --serial <SERIAL> ui snapshot`  → identify a video post.

@@ -5,7 +5,7 @@
 - Precondition: Play Store installed, account signed in, device online.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.android.vending -c android.intent.category.LAUNCHER 1` → launch Play Store.
 2. `ui snapshot` → confirm store home loaded (bottom nav: Inicio/Juegos/Aplicaciones/Libros/Tú).
@@ -25,4 +25,3 @@ inside u2bun (workdir: `u2bun/`)
 - During install the button changes to `Item "Pendiente…"` → `Item "Instalando…"` → `Item "Abrir"`. Do not re-tap "Instalar" while pending.
 - The Play Store is signed in as `Levi thatdream.on@gmail.com` on this device; account selection dialogs may appear on other devices.
 - After `ui input` + Enter, results load after ~2-3s; re-snapshot before tapping the app card.
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

@@ -5,7 +5,7 @@
 - Precondition: Instagram installed and logged in; AdbKeyboard IME active (see SKILL.md §1.4 — activate with `ime set` if not).
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. `adb -s <SERIAL> shell monkey -p com.instagram.android -c android.intent.category.LAUNCHER 1` → launch Instagram.
 2. Ensure AdbKeyboard IME is active: `adb -s <SERIAL> shell settings get secure default_input_method` must be `com.github.uiautomator/.AdbKeyboard`. If not: `ime enable` + `ime set` (SKILL.md §1.4).
@@ -25,4 +25,3 @@ inside u2bun (workdir: `u2bun/`)
 - Composer placeholder varies per post; locate the `Input` node by class, not text.
 - Non-ASCII: verify `input_method: "adb_keyboard"`; a "clipboard" response means corruption. `ui input --clear-first` does NOT clear a field already containing corrupted text — it appends; use `ADB_KEYBOARD_CLEAR_TEXT` broadcast instead.
 - Back from comments sheet returns to home feed; comment stays posted (verify in feed: "<username> <comentario>").
-- Device serial: `192.168.1.19:5555` (WiFi).

@@ -5,7 +5,7 @@
 - Precondition: Facebook installed and logged in.
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. Open the profile URL forcing the full Facebook app (Lite steals the intent otherwise):
    `adb -s <SERIAL> shell am force-stop com.facebook.lite`
@@ -28,4 +28,3 @@ inside u2bun (workdir: `u2bun/`)
 - The page only shows ~2-3 posts per screen; the first post in the feed (e.g. pinned "12 may.") may need extra scrolls. Some posts at the screen edge are still tappable by bounds.
 - After tapping a post's photo area (not the action row) the post opens full-screen; press `Atrás` to return to the list.
 - Dark-mode Facebook renders the active like icon in lighter blue `(162,197,255)`; adjust the pixel check accordingly.
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

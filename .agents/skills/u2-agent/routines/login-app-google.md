@@ -5,7 +5,7 @@
 - Precondition: app installed, not logged in; a Google account exists on the device (this device: Levi / thatdream.on@gmail.com).
 
 ## Steps
-inside u2bun (workdir: `u2bun/`)
+Run from the repo root (where `src/index.ts` lives):
 
 1. Launch the app: `adb -s <SERIAL> shell monkey -p <PACKAGE> -c android.intent.category.LAUNCHER 1` (monkey, not `app start`). Confirm with `ui snapshot`.
 2. Handle first-run onboarding in order (snapshot after each):
@@ -28,4 +28,3 @@ inside u2bun (workdir: `u2bun/`)
 - After tapping "Continuar" on the GMS "Cómo funciona" sheet, focus may land on a back/home area and drop you to the launcher (seen once) — relaunch the app with monkey and repeat.
 - The GMS sheet may not appear if Google account flows were dismissed before; "Configura Iniciar sesión con Google" button restores it.
 - Privacy/consent dialogs (eDreams) and Xiaomi security analysis (`com.miui.global.packageinstaller`) block first launch; dismiss with "Aceptar y Cerrar" / "Abrir".
-- Device serial: `192.168.1.19:5555` (WiFi) — the old `da0f5e72` (USB) no longer applies.

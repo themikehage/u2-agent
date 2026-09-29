@@ -1,7 +1,7 @@
 # u2bun — Auditoría Profesional de Rendimiento y Velocidad
 
 > **Sesión de referencia**: YouTube → search "tarta red velvet" → like  
-> **Dispositivo**: Mi_9_SE `192.168.1.19:5555` (Wi-Fi ADB)  
+> **Dispositivo**: Mi_9_SE `<SERIAL>` (Wi-Fi ADB)  
 > **Stack**: Bun/TypeScript, daemon HTTP local, uiautomator2 via u2client
 
 ---

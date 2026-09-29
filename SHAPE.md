@@ -20,14 +20,14 @@ How `u2-agent` behaves from the operator's point of view. This document describe
 ### Persona A — Human Operator (Ad hoc testing & troubleshooting)
 
 1. `bun run src/index.ts device list` — List attached ADB devices.
-2. `bun run src/index.ts --serial da0f5e72 ui snapshot` — Inspect compact, readable semantic screen layout.
-3. `bun run src/index.ts --serial da0f5e72 ui tap --ref @1` — Execute tap by handle.
+2. `bun run src/index.ts --serial <SERIAL> ui snapshot` — Inspect compact, readable semantic screen layout.
+3. `bun run src/index.ts --serial <SERIAL> ui tap --ref @1` — Execute tap by handle.
 
 ### Persona B — LLM Agent (Claude Code, OpenCode, Gemini, etc.)
 
 1. `bun run src/index.ts tools schema --format openai` — Discover capability catalog.
-2. `bun run src/index.ts --serial da0f5e72 ui snapshot` — Get ultra-compact semantic tree + `@refs` (~250 tokens).
-3. `bun run src/index.ts --serial da0f5e72 ui tap --ref @1` — Execute sub-15ms handle action, returning `ok`.
+2. `bun run src/index.ts --serial <SERIAL> ui snapshot` — Get ultra-compact semantic tree + `@refs` (~250 tokens).
+3. `bun run src/index.ts --serial <SERIAL> ui tap --ref @1` — Execute sub-15ms handle action, returning `ok`.
 4. Loop: `ui snapshot` $\to$ choose `--ref @N` $\to$ `ui tap --ref @N` $\to$ verify `ok`.
 
 ---
@@ -52,7 +52,7 @@ ok
 ### 3.3 Query Commands (`app.current`, `app.list`, `device.list`)
 - `app.current`: `com.facebook.katana/com.facebook.katana.MainActivity`
 - `app.list`: Plain list with one package per line.
-- `device.list`: `da0f5e72 device Pixel 6`
+- `device.list`: `<SERIAL> device Pixel 6`
 
 ---
 
