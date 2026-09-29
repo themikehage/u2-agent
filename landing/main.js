@@ -1,281 +1,185 @@
-/**
- * u2-agent Landing Page Interactive Engine
- */
+/* u2-agent — Control Drawing U2-001
+   Fig. 1 runs the agent control loop as a live signal; every command is copyable. */
 
-document.addEventListener('DOMContentLoaded', () => {
-  initHeroTerminal();
-  initCalculator();
-  initSimulator();
-  initCopyButtons();
-});
+(function () {
+  "use strict";
 
-/* ==========================================================================
-   Hero Terminal Interactive Simulation
-   ========================================================================== */
-function initHeroTerminal() {
-  const terminalBody = document.getElementById('hero-terminal-body');
-  const btnReplay = document.getElementById('terminal-replay-btn');
-  if (!terminalBody) return;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const script = [
-    { type: 'comment', text: '# 1. Request ultra-compact semantic screen snapshot' },
-    { type: 'cmd', text: 'u2-agent ui snapshot' },
-    { type: 'pause', delay: 400 },
-    { type: 'output', html: '<div class="t-app-header">[App: com.google.android.youtube]</div>' },
-    { type: 'output', html: '<span class="t-handle">[@1]</span> <span class="t-role">Input</span> <span class="t-text">"Search YouTube"</span>' },
-    { type: 'output', html: '<span class="t-handle">[@2]</span> <span class="t-role">Button</span> <span class="t-text">"Explore trending"</span>' },
-    { type: 'output', html: '<span class="t-handle">[@3]</span> <span class="t-role">Item</span> <span class="t-text">"Live lo-fi hip hop radio - beats to relax/study to"</span>' },
-    { type: 'output', html: '<span class="t-handle">[@4]</span> <span class="t-role">Button</span> <span class="t-text">"Subscribe"</span>' },
-    { type: 'pause', delay: 700 },
-    { type: 'comment', text: '\n# 2. Tap search bar by ephemeral RAM handle (<15ms via daemon)' },
-    { type: 'cmd', text: 'u2-agent ui tap --ref @1' },
-    { type: 'pause', delay: 300 },
-    { type: 'output', html: '<span class="t-success">ok</span>' },
-    { type: 'pause', delay: 600 },
-    { type: 'comment', text: '\n# 3. Type query with instant Unicode & accent support' },
-    { type: 'cmd', text: 'u2-agent ui type --ref @1 --text "lofi study beats"' },
-    { type: 'pause', delay: 350 },
-    { type: 'output', html: '<span class="t-success">ok</span>' },
-    { type: 'pause', delay: 600 },
-    { type: 'comment', text: '\n# 4. Press Enter to submit search' },
-    { type: 'cmd', text: 'u2-agent ui press --key enter' },
-    { type: 'pause', delay: 250 },
-    { type: 'output', html: '<span class="t-success">ok</span>' },
+  /* --- Fig. 1 · the control loop runner ---------------------------------- */
+
+  var STATIONS = [
+    {
+      ref: "@1",
+      stage: "reading the screen",
+      body:
+        "$ u2-agent ui snapshot\n" +
+        "\n" +
+        '[App: com.google.android.youtube]\n' +
+        '[@1] Input  "Search YouTube"\n' +
+        '[@2] Tab    "Home"\n' +
+        '[@3] Tab    "Shorts"\n' +
+        "\n" +
+        "\u2192 3 actionable handles \u00b7 ~250 tokens"
+    },
+    {
+      ref: "@1",
+      stage: "resolving the handle",
+      body:
+        "$ u2-agent ui tap --ref @1\n" +
+        "\n" +
+        "resolving @1 from the hot handle store\n" +
+        '\u2192 EditText "Search YouTube"  [144,120][936,216]\n' +
+        "\u2192 under 15 ms \u00b7 no cold re-dump"
+    },
+    {
+      ref: "@3",
+      stage: "executing the action",
+      body:
+        '$ u2-agent ui type --ref @1 --text "synthwave"\n' +
+        "\n" +
+        "ok\n" +
+        "\n" +
+        "\u2192 stdout carries machine text only\n" +
+        "\u2192 diagnostics stay on stderr"
+    }
   ];
 
-  let currentStep = 0;
-  let isRunning = false;
-  let abortController = new AbortController();
+  var loop = document.querySelector("[data-loop]");
 
-  async function runScript() {
-    if (isRunning) return;
-    isRunning = true;
-    terminalBody.innerHTML = '';
+  if (loop) {
+    var stations = Array.prototype.slice.call(loop.querySelectorAll(".station"));
+    var wires = Array.prototype.slice.call(loop.querySelectorAll(".wire"));
+    var stateEl = loop.querySelector("[data-loop-state]");
+    var refEl = loop.querySelector("[data-readout-ref]");
+    var stageEl = loop.querySelector("[data-readout-stage]");
+    var bodyEl = loop.querySelector("[data-readout-body]");
+    var runBtn = loop.querySelector("[data-loop-run]");
+    var timers = [];
+    var running = false;
 
-    try {
-      for (const item of script) {
-        if (abortController.signal.aborted) break;
+    function clearTimers() {
+      timers.forEach(clearTimeout);
+      timers = [];
+    }
 
-        if (item.type === 'comment') {
-          const div = document.createElement('div');
-          div.className = 't-comment';
-          div.textContent = item.text;
-          terminalBody.appendChild(div);
-          terminalBody.scrollTop = terminalBody.scrollHeight;
-        } else if (item.type === 'cmd') {
-          const row = document.createElement('div');
-          row.innerHTML = `<span class="t-prompt">$ </span><span class="t-cmd"></span><span class="t-cursor"></span>`;
-          terminalBody.appendChild(row);
-          const cmdSpan = row.querySelector('.t-cmd');
-          const cursor = row.querySelector('.t-cursor');
+    function paint(index) {
+      stations.forEach(function (s, i) {
+        s.classList.toggle("is-active", i <= index);
+      });
+      wires.forEach(function (w, i) {
+        w.classList.toggle("is-hot", i < index);
+      });
+      var data = STATIONS[index];
+      refEl.textContent = data.ref;
+      stageEl.textContent = data.stage;
+      bodyEl.textContent = data.body;
+    }
 
-          // Typewriter effect
-          for (let i = 0; i < item.text.length; i++) {
-            if (abortController.signal.aborted) break;
-            cmdSpan.textContent += item.text[i];
-            terminalBody.scrollTop = terminalBody.scrollHeight;
-            await sleep(28);
-          }
-          cursor.remove();
-        } else if (item.type === 'pause') {
-          await sleep(item.delay);
-        } else if (item.type === 'output') {
-          const div = document.createElement('div');
-          div.innerHTML = item.html;
-          terminalBody.appendChild(div);
-          terminalBody.scrollTop = terminalBody.scrollHeight;
-        }
+    function idle(message) {
+      running = false;
+      if (runBtn) runBtn.disabled = false;
+      if (stateEl) {
+        stateEl.textContent = message || "idle";
+        stateEl.classList.remove("is-live");
       }
-    } finally {
-      isRunning = false;
-      const finalPrompt = document.createElement('div');
-      finalPrompt.innerHTML = `<span class="t-prompt">$ </span><span class="t-cursor"></span>`;
-      terminalBody.appendChild(finalPrompt);
-      terminalBody.scrollTop = terminalBody.scrollHeight;
+    }
+
+    function complete() {
+      running = false;
+      if (runBtn) runBtn.disabled = false;
+      stations.forEach(function (s) { s.classList.add("is-active"); });
+      wires.forEach(function (w) { w.classList.remove("is-hot"); });
+      if (stateEl) {
+        stateEl.textContent = "complete";
+        stateEl.classList.remove("is-live");
+      }
+    }
+
+    function run() {
+      if (running) return;
+      running = true;
+      clearTimers();
+      stations.forEach(function (s) { s.classList.remove("is-active"); });
+      wires.forEach(function (w) { w.classList.remove("is-hot"); });
+      if (runBtn) runBtn.disabled = true;
+      if (stateEl) {
+        stateEl.textContent = "live";
+        stateEl.classList.add("is-live");
+      }
+
+      if (reduce) {
+        bodyEl.textContent = STATIONS[2].body;
+        refEl.textContent = STATIONS[2].ref;
+        stageEl.textContent = STATIONS[2].stage;
+        complete();
+        return;
+      }
+
+      paint(0);
+      timers.push(setTimeout(function () { paint(1); }, 620));
+      timers.push(setTimeout(function () { paint(2); }, 1240));
+      timers.push(setTimeout(function () { idle("idle"); }, 2000));
+    }
+
+    if (runBtn) runBtn.addEventListener("click", run);
+
+    if (reduce) {
+      paint(2);
+      complete();
+    } else {
+      timers.push(setTimeout(run, 700));
     }
   }
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  /* --- Copyable commands -------------------------------------------------- */
 
-  if (btnReplay) {
-    btnReplay.addEventListener('click', () => {
-      abortController.abort();
-      abortController = new AbortController();
-      setTimeout(runScript, 100);
-    });
-  }
+  var copies = Array.prototype.slice.call(document.querySelectorAll(".copy[data-copy]"));
 
-  runScript();
-}
-
-/* ==========================================================================
-   Token Savings Calculator
-   ========================================================================== */
-function initCalculator() {
-  const slider = document.getElementById('calc-steps-slider');
-  const sliderDisplay = document.getElementById('calc-steps-val');
-  const xmlTokensEl = document.getElementById('calc-xml-tokens');
-  const u2TokensEl = document.getElementById('calc-u2-tokens');
-  const savedTokensEl = document.getElementById('calc-saved-tokens');
-  const costSavingsEl = document.getElementById('calc-cost-savings');
-
-  if (!slider) return;
-
-  function update() {
-    const steps = parseInt(slider.value, 10);
-    if (sliderDisplay) sliderDisplay.textContent = steps;
-
-    const xmlTokens = steps * 15000;
-    const u2Tokens = steps * 240;
-    const saved = xmlTokens - u2Tokens;
-    const percent = Math.round((saved / xmlTokens) * 100);
-
-    // Assume average LLM input pricing of $3.00 per 1M tokens (e.g. Claude 3.5 Sonnet / GPT-4o)
-    const dollarsSaved = ((saved / 1_000_000) * 3.0).toFixed(2);
-
-    if (xmlTokensEl) xmlTokensEl.textContent = xmlTokens.toLocaleString() + ' tokens';
-    if (u2TokensEl) u2TokensEl.textContent = u2Tokens.toLocaleString() + ' tokens';
-    if (savedTokensEl) savedTokensEl.textContent = `${percent}% (${saved.toLocaleString()})`;
-    if (costSavingsEl) costSavingsEl.textContent = `$${dollarsSaved} / run`;
-  }
-
-  slider.addEventListener('input', update);
-  update();
-}
-
-/* ==========================================================================
-   CLI Interactive Simulator
-   ========================================================================== */
-function initSimulator() {
-  const tabs = document.querySelectorAll('.sim-tab');
-  const titleEl = document.getElementById('sim-active-title');
-  const descEl = document.getElementById('sim-active-desc');
-  const cmdEl = document.getElementById('sim-active-cmd');
-  const outputEl = document.getElementById('sim-output');
-  const runBtn = document.getElementById('sim-run-btn');
-
-  if (!tabs.length || !outputEl) return;
-
-  const data = {
-    snapshot: {
-      title: 'UI Snapshot (Semantic Extraction)',
-      desc: 'Retrieves compact view tree and assigns memory handles (@1, @2, ...) with automatic structural noise filtering.',
-      cmd: 'u2-agent ui snapshot --limit 30',
-      output: `[App: com.android.settings | fingerprint: a8f9c1e0]
-[@1] Input "Search settings"
-[@2] Item "Network & internet (Wi-Fi, Mobile, Data usage)"
-[@3] Item "Connected devices (Bluetooth, pairing)"
-[@4] Item "Apps (Recent apps, default apps)"
-[@5] Item "Notifications (Notification history, conversations)"
-[@6] Item "Battery (84% - About 1 d, 4 hr left)"
-[@7] Item "Storage (42% used - 74 GB free)"`
-    },
-    tap: {
-      title: 'Handle Tap (sub-15ms via Daemon)',
-      desc: 'Dispatches tap directly to the cached RAM handle coordinates without cold re-dumping.',
-      cmd: 'u2-agent ui tap --ref @2',
-      output: `ok`
-    },
-    type: {
-      title: 'Focused Input (UTF-8 / AdbKeyboard)',
-      desc: 'Focuses element by handle and broadcasts text via AdbKeyboard for flawless Unicode handling.',
-      cmd: 'u2-agent ui type --ref @1 --text "Wi-Fi Hotspot"',
-      output: `ok`
-    },
-    schema: {
-      title: 'Agent Tool Schema Export',
-      desc: 'Exports standard function-calling schemas for OpenAI, Anthropic, or Gemini tool configurations.',
-      cmd: 'u2-agent tools schema --format openai',
-      output: `{
-  "type": "function",
-  "function": {
-    "name": "u2_ui_tap",
-    "description": "Tap visible UI element matching selector handle or coordinates",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "ref": { "type": "string", "description": "Element handle (@1..@N)" },
-        "pos": { "type": "string", "description": "Target X,Y coordinates" }
-      }
-    }
-  }
-}`
-    },
-    restart: {
-      title: 'App Lifecycle Management',
-      desc: 'Force-stops and restarts application package in a single atomic ADB invocation.',
-      cmd: 'u2-agent app restart --package com.google.android.youtube',
-      output: `ok`
-    }
-  };
-
-  function switchTab(key) {
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.key === key));
-    const item = data[key];
-    if (!item) return;
-
-    if (titleEl) titleEl.textContent = item.title;
-    if (descEl) descEl.textContent = item.desc;
-    if (cmdEl) cmdEl.textContent = item.cmd;
-
-    // Simulate instant execution
-    outputEl.innerHTML = `<span class="t-prompt">$ </span><span class="t-cmd">${item.cmd}</span>\n\n${escapeHtml(item.output)}`;
-  }
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.key));
-  });
-
-  if (runBtn) {
-    runBtn.addEventListener('click', () => {
-      const activeTab = document.querySelector('.sim-tab.active');
-      if (activeTab) {
-        outputEl.innerHTML = '<span class="t-comment">Executing command on device...</span>';
-        setTimeout(() => switchTab(activeTab.dataset.key), 120);
-      }
-    });
-  }
-
-  // Initial tab
-  switchTab('snapshot');
-}
-
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-/* ==========================================================================
-   Copy Code Snippets
-   ========================================================================== */
-function initCopyButtons() {
-  document.querySelectorAll('.copy-trigger').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.dataset.copyTarget;
-      let textToCopy = '';
-
-      if (targetId) {
-        const el = document.getElementById(targetId);
-        if (el) textToCopy = el.textContent || el.innerText;
-      } else if (btn.dataset.copyText) {
-        textToCopy = btn.dataset.copyText;
-      }
-
-      if (textToCopy) {
-        navigator.clipboard.writeText(textToCopy.trim()).then(() => {
-          const originalText = btn.textContent;
-          btn.textContent = 'Copied!';
-          btn.style.color = '#00ff9d';
-          setTimeout(() => {
-            btn.textContent = originalText;
-            btn.style.color = '';
-          }, 2000);
-        });
+  copies.forEach(function (button) {
+    var original = button.textContent;
+    button.addEventListener("click", function () {
+      var text = button.getAttribute("data-copy") || "";
+      var done = function () {
+        button.textContent = "Copied";
+        button.classList.add("is-done");
+        setTimeout(function () {
+          button.textContent = original;
+          button.classList.remove("is-done");
+        }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, done);
+      } else {
+        done();
       }
     });
   });
-}
+  /* --- Recorded run · click-to-load YouTube -------------------------------- */
+
+  var screens = Array.prototype.slice.call(document.querySelectorAll("[data-video-screen]"));
+
+  screens.forEach(function (screen) {
+    var id = screen.getAttribute("data-video-id");
+    var start = screen.querySelector("[data-video-start]");
+    if (!id || !start) return;
+
+    var reel = screen.closest("[data-reel]");
+    var state = reel ? reel.querySelector("[data-reel-state]") : null;
+
+    start.addEventListener("click", function () {
+      var frame = document.createElement("iframe");
+      frame.className = "video__frame";
+      frame.src = "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0";
+      frame.title = start.getAttribute("aria-label") || "u2-agent recorded run";
+      frame.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share");
+      frame.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      frame.setAttribute("allowfullscreen", "");
+      screen.replaceChild(frame, start);
+      if (state) {
+        state.textContent = "playing";
+        state.classList.add("is-live");
+      }
+    });
+  });
+})();
